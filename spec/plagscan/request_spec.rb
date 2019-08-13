@@ -127,4 +127,50 @@ describe Plagscan::Request do
     it_behaves_like 'raises InvalidMethodError for', method: :trace
     it_behaves_like 'raises InvalidMethodError for', method: :patch
   end
+
+  describe '.json_request' do
+    it 'allows just path to be passed through to `request`' do
+      stub_request(:get, 'https://api.plagscan.com/v3/my/path').to_return(body: '{"key":"abc"}')
+      expect(described_class).to receive(:request).with('my/path', {}).and_call_original
+      described_class.json_request 'my/path'
+    end
+
+    it 'allows options to be passed through to `request`' do
+      stub_request(:get, 'https://api.plagscan.com/v3/my/path?my=option').
+        to_return(body: '{"key":"abc"}')
+      expect(described_class).to(
+        receive(:request).
+          with('my/path', body: { my: 'option' }).
+          and_call_original
+      )
+      described_class.json_request 'my/path', body: { my: 'option' }
+    end
+
+    it 'returns the parsed result if the response is success' do
+      stub_request(:get, 'https://api.plagscan.com/v3/success').
+        to_return(body: '{"key1":"abc","key2":"def"}')
+
+      result = described_class.json_request 'success'
+
+      expect(result).to eq('key1' => 'abc', 'key2' => 'def')
+    end
+
+    it 'raises a HTTPError if the response is not success' do
+      stub_request(:get, 'https://api.plagscan.com/v3/bad_request').
+        to_return(body: 'No can do buddy', status: 400)
+
+      expect do
+        described_class.json_request 'bad_request'
+      end.to raise_error Plagscan::HTTPError, 'Invalid http response code: 400'
+    end
+
+    it 'raises a JsonParseError if the response is malformed' do
+      stub_request(:get, 'https://api.plagscan.com/v3/malformed').
+        to_return(body: 'Totes invalid')
+
+      expect do
+        described_class.json_request 'malformed'
+      end.to raise_error Plagscan::JsonParseError, 'PlagScan response parse error: Totes invalid'
+    end
+  end
 end

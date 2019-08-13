@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'uri'
-require 'openssl'
-require 'net/http'
-
 module Plagscan
   #
   # PlagScan HTTP request service
@@ -34,6 +30,18 @@ module Plagscan
         http = create_http(options)
         req = create_request(path, options)
         http.start { http.request(req) }
+      end
+
+      def json_request(path, options = {})
+        response = Plagscan::Request.request(path, options)
+
+        unless response.is_a? Net::HTTPOK
+          raise Plagscan::HTTPError, "Invalid http response code: #{response.code}"
+        end
+
+        JSON.parse response.body
+      rescue JSON::ParserError
+        raise Plagscan::JsonParseError, "PlagScan response parse error: #{response.body}"
       end
 
       private

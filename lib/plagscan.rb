@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+require 'uri'
+require 'openssl'
+require 'net/http'
+
+require 'json'
+
 require 'plagscan/version'
 
 require 'plagscan/error'
@@ -7,6 +13,7 @@ require 'plagscan/request'
 
 # APIs
 require 'plagscan/ping'
+require 'plagscan/token'
 
 #
 # Basic configuration for PlagScan API
