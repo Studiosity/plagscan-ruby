@@ -22,6 +22,10 @@ module Plagscan
         Plagscan.api_base + path
       end
 
+      def user_agent
+        "PlagScan-Ruby/#{Plagscan::VERSION}"
+      end
+
       def request(path, options = {})
         options = DEFAULT_REQUEST_OPTIONS.merge(options)
 
@@ -48,35 +52,18 @@ module Plagscan
       end
 
       def create_request(path, options)
-        headers = extract_headers(options)
         body = options[:body]
+        headers = { 'User-Agent' => user_agent }
+        uri = api_url path
 
         if options[:method] == :post
-          req = Net::HTTP::Post.new(path, headers)
+          req = Net::HTTP::Post.new(uri, headers)
           add_body(req, body) if body
           req
         else
-          uri = api_url path
           uri += '?' + body.map { |k, v| "#{k}=#{v}" }.join('&') if body
           Net::HTTP::Get.new(uri, headers)
         end
-      end
-
-      def extract_headers(options)
-        headers = options[:headers]
-
-        token = options.delete :token
-        if token
-          headers ||= {}
-
-          headers['X-Auth-Token'] = token.auth_token
-          headers['X-User-Id'] = token.user_id
-        end
-
-        return unless headers
-
-        headers = Util.stringify_hash_keys headers
-        headers.delete_if { |key, value| key.nil? || value.nil? }
       end
 
       def add_body(request, body)

@@ -1,5 +1,23 @@
+require: rubocop-rspec
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+Metrics/BlockLength:
+  Exclude:
+    - "**/*_spec.rb"
+
 Metrics/LineLength:
   Max: 100
 
 Metrics/MethodLength:
   Max: 12
+
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/MessageSpies:
+  EnforcedStyle: receive
+
+RSpec/MultipleExpectations:
+  Max: 2
