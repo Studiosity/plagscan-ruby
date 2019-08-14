@@ -11,10 +11,10 @@ Metrics/LineLength:
   Max: 100
 
 Metrics/MethodLength:
-  Max: 12
+  Max: 13
 
 RSpec/ExampleLength:
-  Max: 10
+  Max: 16
 
 RSpec/MessageSpies:
   EnforcedStyle: receive

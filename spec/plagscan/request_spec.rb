@@ -22,110 +22,119 @@ describe Plagscan::Request do
   end
 
   describe '.request' do
-    context 'with GET method' do
+    shared_examples 'inline request type' do |method:|
       it 'calls to API for requested URL' do
-        stub_request(:get, 'https://api.plagscan.com/v3/my/path').
+        stub_request(method, 'https://api.plagscan.com/v3/my/path').
           to_return(body: 'request worked!')
 
-        response = described_class.request 'my/path'
+        response = described_class.request 'my/path', method: method
 
         expect(response).to be_a Net::HTTPOK
         expect(response.body).to eq 'request worked!'
       end
 
       it 'passes through request parameters in the path' do
-        stub_request(:get, 'https://api.plagscan.com/v3/with/params?test=parameter').
+        stub_request(method, 'https://api.plagscan.com/v3/with/params?test=parameter').
           to_return(body: 'yep, it had parameters')
 
-        response = described_class.request('with/params', body: { test: 'parameter' })
+        response =
+          described_class.request 'with/params', method: method, body: { test: 'parameter' }
 
         expect(response).to be_a Net::HTTPOK
         expect(response.body).to eq 'yep, it had parameters'
       end
 
       it 'passes through gem user-agent' do
-        stub_request(:get, 'https://api.plagscan.com/v3/with/useragent').
+        stub_request(method, 'https://api.plagscan.com/v3/with/useragent').
           with(headers: { 'User-Agent' => "PlagScan-Ruby/#{Plagscan::VERSION}" }).
           to_return(body: 'yep, it had a user agent')
 
-        response = described_class.request('with/useragent')
+        response = described_class.request 'with/useragent', method: method
 
         expect(response.body).to eq 'yep, it had a user agent'
       end
 
       it 'returns error response types' do
-        stub_request(:get, 'https://api.plagscan.com/v3/not/here').
+        stub_request(method, 'https://api.plagscan.com/v3/not/here').
           to_return(body: 'path not found', status: 404)
 
-        response = described_class.request('not/here')
+        response = described_class.request 'not/here', method: method
 
         expect(response).to be_a Net::HTTPNotFound
         expect(response.body).to eq 'path not found'
       end
     end
 
-    context 'with POST method' do
+    shared_examples 'body request type' do |method:|
       it 'calls to API for requested URL' do
-        stub_request(:post, 'https://api.plagscan.com/v3/post/path').
+        stub_request(method, 'https://api.plagscan.com/v3/post/path').
           to_return(body: 'request worked!')
 
-        response = described_class.request 'post/path', method: :post
+        response = described_class.request 'post/path', method: method
 
         expect(response).to be_a Net::HTTPOK
         expect(response.body).to eq 'request worked!'
       end
 
       it 'passes through request parameters in the body' do
-        stub_request(:post, 'https://api.plagscan.com/v3/with/params').
+        stub_request(method, 'https://api.plagscan.com/v3/with/params').
           with(body: { test: 'parameter' }, headers: { 'Content-Type' => 'application/json' }).
           to_return(body: 'yep, it had parameters')
 
         response =
-          described_class.request(
-            'with/params', method: :post, body: { test: 'parameter' }
-          )
+          described_class.request 'with/params', method: method, body: { test: 'parameter' }
 
         expect(response).to be_a Net::HTTPOK
         expect(response.body).to eq 'yep, it had parameters'
       end
 
       it 'passes through string type body' do
-        stub_request(:post, 'https://api.plagscan.com/v3/with/params').
+        stub_request(method, 'https://api.plagscan.com/v3/with/params').
           with(body: 'not so complex').
           to_return(body: 'yep, it had parameters')
 
-        response = described_class.request('with/params', method: :post, body: 'not so complex')
+        response = described_class.request 'with/params', method: method, body: 'not so complex'
 
         expect(response).to be_a Net::HTTPOK
         expect(response.body).to eq 'yep, it had parameters'
       end
 
       it 'passes through gem user-agent' do
-        stub_request(:post, 'https://api.plagscan.com/v3/with/useragent').
+        stub_request(method, 'https://api.plagscan.com/v3/with/useragent').
           with(headers: { 'User-Agent' => "PlagScan-Ruby/#{Plagscan::VERSION}" }).
           to_return(body: 'yep, it had a user agent')
 
-        response = described_class.request('with/useragent', method: :post)
+        response = described_class.request 'with/useragent', method: method
 
         expect(response.body).to eq 'yep, it had a user agent'
       end
     end
 
-    shared_examples_for 'raises InvalidMethodError for' do |method:|
-      it do
-        expect do
-          described_class.request('invalid/method', method: method)
-        end.to raise_error Plagscan::InvalidMethodError
-      end
+    it 'defaults to GET request if no method is specified' do
+      stub_request(:get, 'https://api.plagscan.com/v3/my/path').
+        to_return(body: 'request worked!')
+
+      response = described_class.request 'my/path'
+
+      expect(response).to be_a Net::HTTPOK
+      expect(response.body).to eq 'request worked!'
     end
 
-    it_behaves_like 'raises InvalidMethodError for', method: :head
-    it_behaves_like 'raises InvalidMethodError for', method: :put
-    it_behaves_like 'raises InvalidMethodError for', method: :delete
-    it_behaves_like 'raises InvalidMethodError for', method: :connect
-    it_behaves_like 'raises InvalidMethodError for', method: :options
-    it_behaves_like 'raises InvalidMethodError for', method: :trace
-    it_behaves_like 'raises InvalidMethodError for', method: :patch
+    it_behaves_like 'inline request type', method: :get
+    it_behaves_like 'inline request type', method: :head
+    it_behaves_like 'inline request type', method: :delete
+    it_behaves_like 'inline request type', method: :options
+    it_behaves_like 'inline request type', method: :trace
+
+    it_behaves_like 'body request type', method: :post
+    it_behaves_like 'body request type', method: :put
+    it_behaves_like 'body request type', method: :patch
+
+    it 'raises InvalidMethodError if an invalid method provided' do
+      expect do
+        described_class.request 'invalid', method: :invalid
+      end.to raise_error Plagscan::InvalidMethodError, '`invalid` is not a valid HTTP method'
+    end
   end
 
   describe '.json_request' do
@@ -143,6 +152,7 @@ describe Plagscan::Request do
           with('my/path', body: { my: 'option' }).
           and_call_original
       )
+
       described_class.json_request 'my/path', body: { my: 'option' }
     end
 
@@ -162,6 +172,15 @@ describe Plagscan::Request do
       expect do
         described_class.json_request 'bad_request'
       end.to raise_error Plagscan::HTTPError, 'Invalid http response code: 400'
+    end
+
+    it 'allows asserting the exact response type' do
+      stub_request(:get, 'https://api.plagscan.com/v3/no_content').
+        to_return(body: '{"key":"abc"}')
+
+      expect do
+        described_class.json_request 'no_content', expected_result: Net::HTTPNoContent
+      end.to raise_error Plagscan::HTTPError, 'Invalid http response code: 200'
     end
 
     it 'raises a JsonParseError if the response is malformed' do

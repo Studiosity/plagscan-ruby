@@ -5,4 +5,5 @@ module Plagscan
   class HTTPError < Error; end
   class InvalidMethodError < HTTPError; end
   class JsonParseError < Error; end
+  class DocumentError < Error; end
 end

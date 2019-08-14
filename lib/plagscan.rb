@@ -14,6 +14,7 @@ require 'plagscan/request'
 # APIs
 require 'plagscan/ping'
 require 'plagscan/token'
+require 'plagscan/documents'
 
 #
 # Basic configuration for PlagScan API

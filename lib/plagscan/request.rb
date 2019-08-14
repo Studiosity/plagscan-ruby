@@ -24,9 +24,6 @@ module Plagscan
 
       def request(path, options = {})
         options = DEFAULT_REQUEST_OPTIONS.merge(options)
-
-        raise Plagscan::InvalidMethodError unless %i[get post].include? options[:method]
-
         http = create_http(options)
         req = create_request(path, options)
         http.start { http.request(req) }
@@ -35,7 +32,7 @@ module Plagscan
       def json_request(path, options = {})
         response = Plagscan::Request.request(path, options)
 
-        unless response.is_a? Net::HTTPOK
+        unless response.is_a?(options[:expected_result] || Net::HTTPSuccess)
           raise Plagscan::HTTPError, "Invalid http response code: #{response.code}"
         end
 
@@ -60,18 +57,28 @@ module Plagscan
       end
 
       def create_request(path, options)
-        body = options[:body]
         headers = { 'User-Agent' => user_agent }
         uri = api_url path
 
-        if options[:method] == :post
-          req = Net::HTTP::Post.new(uri, headers)
-          add_body(req, body) if body
-          req
+        if %i[post put patch].include? options[:method]
+          body_request uri, headers, options
         else
-          uri += '?' + body.map { |k, v| "#{k}=#{v}" }.join('&') if body
-          Net::HTTP::Get.new(uri, headers)
+          uri_request uri, headers, options
         end
+      end
+
+      def body_request(uri, headers, options)
+        uri += '?access_token=' + options[:access_token] if options[:access_token]
+        req = http_method(options).new(uri, headers)
+        add_body(req, options[:body]) if options[:body]
+        req
+      end
+
+      def uri_request(uri, headers, options)
+        body = options[:body] || {}
+        body[:access_token] = options[:access_token] if options[:access_token]
+        uri += '?' + body.map { |k, v| "#{k}=#{v}" }.join('&') unless body.empty?
+        http_method(options).new(uri, headers)
       end
 
       def add_body(request, body)
@@ -81,6 +88,14 @@ module Plagscan
         else
           request.body = body.to_s
         end
+      end
+
+      def http_method(options)
+        method = options[:method].to_s.downcase
+        method = method[0].upcase.concat(method[1..-1])
+        Net::HTTP.const_get(method)
+      rescue NameError
+        raise Plagscan::InvalidMethodError, "`#{options[:method]}` is not a valid HTTP method"
       end
     end
   end
