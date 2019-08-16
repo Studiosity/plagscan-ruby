@@ -33,10 +33,10 @@ module Plagscan
         response = Plagscan::Request.request(path, options)
 
         unless response.is_a?(options[:expected_result] || Net::HTTPSuccess)
-          raise Plagscan::HTTPError, "Invalid http response code: #{response.code}"
+          raise Plagscan::HTTPError, "Invalid http response: #{response.code} - #{response.body}"
         end
 
-        JSON.parse response.body
+        JSON.parse response.body, symbolize_names: true
       rescue JSON::ParserError
         raise Plagscan::JsonParseError, "PlagScan response parse error: #{response.body}"
       end
@@ -83,8 +83,13 @@ module Plagscan
 
       def add_body(request, body)
         if body.is_a? Hash
-          request.body = body.to_json
-          request.content_type = 'application/json'
+          if body.any? { |_, v| v.is_a? File }
+            encoded_body = body.map { |k, v| [k.to_s, v.is_a?(File) ? v : v.to_s] }
+            request.set_form encoded_body, 'multipart/form-data'
+          else
+            request.body = body.to_json
+            request.content_type = 'application/json'
+          end
         else
           request.body = body.to_s
         end

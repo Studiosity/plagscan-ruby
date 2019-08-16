@@ -108,6 +108,18 @@ describe Plagscan::Request do
 
         expect(response.body).to eq 'yep, it had a user agent'
       end
+
+      it 'uses multi-part form submission if any of the params are File type' do
+        stub_request(method, 'https://api.plagscan.com/v3/with/file/params').
+          with(headers: { 'Content-Type' => 'multipart/form-data' }).
+          to_return(body: 'multipart looks good')
+
+        file = File.open('README.md')
+        response =
+          described_class.request 'with/file/params', method: method, body: { my_file: file }
+
+        expect(response.body).to eq 'multipart looks good'
+      end
     end
 
     it 'defaults to GET request if no method is specified' do
@@ -162,7 +174,7 @@ describe Plagscan::Request do
 
       result = described_class.json_request 'success'
 
-      expect(result).to eq('key1' => 'abc', 'key2' => 'def')
+      expect(result).to eq(key1: 'abc', key2: 'def')
     end
 
     it 'raises a HTTPError if the response is not success' do
@@ -171,7 +183,7 @@ describe Plagscan::Request do
 
       expect do
         described_class.json_request 'bad_request'
-      end.to raise_error Plagscan::HTTPError, 'Invalid http response code: 400'
+      end.to raise_error Plagscan::HTTPError, 'Invalid http response: 400 - No can do buddy'
     end
 
     it 'allows asserting the exact response type' do
@@ -180,7 +192,7 @@ describe Plagscan::Request do
 
       expect do
         described_class.json_request 'no_content', expected_result: Net::HTTPNoContent
-      end.to raise_error Plagscan::HTTPError, 'Invalid http response code: 200'
+      end.to raise_error Plagscan::HTTPError, 'Invalid http response: 200 - {"key":"abc"}'
     end
 
     it 'raises a JsonParseError if the response is malformed' do
