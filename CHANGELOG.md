@@ -1,6 +1,13 @@
 # Changelog
 
 ## Unreleased
+- none
+
+## [0.0.4](releases/tag/v0.0.4) - 2019-12-31
+### Added
+- Support for some `users` APIs (list and get)
+
+## [0.0.3](releases/tag/v0.0.3) - 2019-08-16
 ### Updated
 - Support File params in body actions (multipart form)
 - Include response body in invalid http response error message

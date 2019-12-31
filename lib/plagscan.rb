@@ -15,6 +15,7 @@ require 'plagscan/request'
 require 'plagscan/ping'
 require 'plagscan/token'
 require 'plagscan/documents'
+require 'plagscan/users'
 
 #
 # Basic configuration for PlagScan API
@@ -24,3 +25,8 @@ module Plagscan
     'https://api.plagscan.com/v3/'
   end
 end
+
+#
+# Alias `PlagScan` to `Plagscan`
+#
+PlagScan = Plagscan
