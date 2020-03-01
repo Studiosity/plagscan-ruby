@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [0.0.5](releases/tag/v0.0.5) - 2020-03-01
+### Fixed
+- Address CVE-2020-8130 - `rake` OS command injection vulnerability
+
 ## [0.0.4](releases/tag/v0.0.4) - 2019-12-31
 ### Added
 - Support for some `users` APIs (list and get)
