@@ -5,17 +5,17 @@ env:
     - CC_TEST_REPORTER_ID=1e550d84766c7d7d61b7fb36d672a9cf6834600715a798b90e6a66d48574f592
 
 rvm:
-  - 2.3
   - 2.4
   - 2.5
   - 2.6
+  - 2.7
 
 before_install:
   - gem update bundler
 
 install:
   - bundle install --jobs=3 --retry=3
-  - ruby --version | grep '^ruby 2\.3\.' > /dev/null || gem install rubocop
+  - gem install rubocop
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -23,7 +23,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - ruby --version | grep '^ruby 2\.3\.' > /dev/null || rubocop
+  - rubocop
   - bundle exec rake
 
 after_script:

@@ -10,7 +10,7 @@ module Plagscan
     # @param [String] access_token Access token from Token.fetch
     # @param [File] file Document file
     # @param [String] text Text from a document in plain text
-    # @param [named options] userID, textname, toRepository, saveOrig
+    # @param [named options] userID, textname, toRepository, saveOrig, read_timeout
     # @return [Hash] containing document ID and URI location for created resource
     #
     # Note. you should provide fileUpload OR textdata
@@ -19,6 +19,7 @@ module Plagscan
     def self.create(access_token:, file: nil, text: nil, **options)
       raise 'must specify file or text' if file.nil? && text.nil?
 
+      read_timeout = options.delete :read_timeout
       create_props = options.delete_if do |k, _|
         !%i[userID textname toRepository saveOrig].include? k
       end
@@ -26,7 +27,8 @@ module Plagscan
       Plagscan::Request.json_request(
         'documents',
         method: :post, access_token: access_token, expected_result: Net::HTTPCreated,
-        body: create_props.merge(file ? { fileUpload: file } : { textdata: text })
+        body: create_props.merge(file ? { fileUpload: file } : { textdata: text }),
+        read_timeout: read_timeout
       )
     end
 

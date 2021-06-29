@@ -53,6 +53,8 @@ module Plagscan
           http.ca_file = options[:ssl_ca_file] if options[:ssl_ca_file]
         end
 
+        http.read_timeout = options[:read_timeout] if options[:read_timeout]
+
         http
       end
 
