@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Ruby gem for PlagScan (https://www.plagscan.com/) plagiarism checking APIs'
   spec.homepage    = 'https://github.com/Studiosity/plagscan-ruby'
   spec.license     = 'MIT'
+  spec.required_ruby_version = ['>= 2.5.0', '< 3.2.0']
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
@@ -22,6 +23,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.require_paths = ['lib']
@@ -31,6 +33,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rubocop', '~> 0.74'
   spec.add_development_dependency 'rubocop-rspec', '~> 1.35'
-  spec.add_development_dependency 'simplecov', '~> 0.17'
+  spec.add_development_dependency 'simplecov', '~> 0.17', '< 0.18'
   spec.add_development_dependency 'webmock', '~> 3.0'
 end
