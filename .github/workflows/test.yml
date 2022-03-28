@@ -1,0 +1,34 @@
+name: Test Plagscan Ruby gem
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['2.6', '2.7', '3.0', '3.1']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+
+      - name: Lint code - Rubocop
+        run: bundle exec rubocop
+
+      - name: Run tests
+        run: bundle exec rake
+
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: 1e550d84766c7d7d61b7fb36d672a9cf6834600715a798b90e6a66d48574f592
