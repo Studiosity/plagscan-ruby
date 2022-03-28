@@ -30,7 +30,7 @@ module Plagscan
       end
 
       def json_request(path, **options)
-        response = Plagscan::Request.request(path, options)
+        response = Plagscan::Request.request(path, **options)
 
         unless response.is_a?(options[:expected_result] || Net::HTTPSuccess)
           raise Plagscan::HTTPError, "Invalid http response: #{response.code} - #{response.body}"
