@@ -1,4 +1,4 @@
-[![Travis Build Status](http://img.shields.io/travis/Studiosity/plagscan-ruby.svg?style=flat)](https://travis-ci.org/Studiosity/plagscan-ruby)
+[![Github Build Status](https://github.com/Studiosity/plagscan-ruby/actions/workflows/test.yml/badge.svg)](https://github.com/Studiosity/plagscan-ruby/actions/workflows/test.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/43ec9575fe4727b96adb/maintainability)](https://codeclimate.com/github/Studiosity/plagscan-ruby/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/43ec9575fe4727b96adb/test_coverage)](https://codeclimate.com/github/Studiosity/plagscan-ruby/test_coverage)
 [![Gem Version](http://img.shields.io/gem/v/plagscan.svg?style=flat)](http://rubygems.org/gems/plagscan)
