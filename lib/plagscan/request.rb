@@ -22,14 +22,14 @@ module Plagscan
         "PlagScan-Ruby/#{Plagscan::VERSION}"
       end
 
-      def request(path, options = {})
+      def request(path, **options)
         options = DEFAULT_REQUEST_OPTIONS.merge(options)
         http = create_http(options)
         req = create_request(path, options)
         http.start { http.request(req) }
       end
 
-      def json_request(path, options = {})
+      def json_request(path, **options)
         response = Plagscan::Request.request(path, options)
 
         unless response.is_a?(options[:expected_result] || Net::HTTPSuccess)
