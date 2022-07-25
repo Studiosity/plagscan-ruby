@@ -4,15 +4,23 @@ require 'spec_helper'
 
 describe Plagscan::Documents do
   describe '.create' do
-    it 'calls to PlagScan document create API with token and basic text parameter' do
+    it 'calls to PlagScan document create API with token and basic text parameter' do # rubocop:disable RSpec/ExampleLength
+      allow(Plagscan::Request).to(
+        receive(:json_request).
+          with(
+            'documents',
+            method: :post, access_token: 'my-token', expected_result: Net::HTTPCreated,
+            body: { textdata: 'my excellent document' }, read_timeout: 120
+          ).
+          and_return(id: 1_536_238, Location: 'http://example.com/1536238')
+      )
       expect(Plagscan::Request).to(
         receive(:json_request).
           with(
             'documents',
             method: :post, access_token: 'my-token', expected_result: Net::HTTPCreated,
-            body: { textdata: 'my excellent document' }
-          ).
-          and_return(id: 1_536_238, Location: 'http://example.com/1536238')
+            body: { textdata: 'my excellent document' }, read_timeout: 120
+          )
       )
 
       result = described_class.create(access_token: 'my-token', text: 'my excellent document')
@@ -20,16 +28,24 @@ describe Plagscan::Documents do
       expect(result).to eq(id: 1_536_238, Location: 'http://example.com/1536238')
     end
 
-    it 'calls to PlagScan document create API with token and basic file parameter' do
+    it 'calls to PlagScan document create API with token and basic file parameter' do # rubocop:disable RSpec/ExampleLength
       Tempfile.open('foo') do |file|
+        allow(Plagscan::Request).to(
+          receive(:json_request).
+            with(
+              'documents',
+              method: :post, access_token: 'my-token', expected_result: Net::HTTPCreated,
+              body: { fileUpload: file }, read_timeout: 120
+            ).
+            and_return(id: 1_536_238, Location: 'http://example.com/1536238')
+        )
         expect(Plagscan::Request).to(
           receive(:json_request).
             with(
               'documents',
               method: :post, access_token: 'my-token', expected_result: Net::HTTPCreated,
-              body: { fileUpload: file }
-            ).
-            and_return(id: 1_536_238, Location: 'http://example.com/1536238')
+              body: { fileUpload: file }, read_timeout: 120
+            )
         )
 
         result = described_class.create(access_token: 'my-token', file: file)
@@ -38,16 +54,27 @@ describe Plagscan::Documents do
       end
     end
 
-    it 'accepts optional parameters (filtered)' do
+    it 'accepts optional parameters (filtered)' do # rubocop:disable RSpec/ExampleLength
+      allow(Plagscan::Request).to(
+        receive(:json_request).
+          with(
+            'documents',
+            method: :post, access_token: 'my-token', expected_result: Net::HTTPCreated,
+            body: { textdata: 'my excellent document', userID: 3940,
+                    textname: 'MyFile.docx', toRepository: true, saveOrig: false },
+            read_timeout: 120
+          ).
+          and_return(id: 1_536_238, Location: 'http://example.com/1536238')
+      )
       expect(Plagscan::Request).to(
         receive(:json_request).
           with(
             'documents',
             method: :post, access_token: 'my-token', expected_result: Net::HTTPCreated,
             body: { textdata: 'my excellent document', userID: 3940,
-                    textname: 'MyFile.docx', toRepository: true, saveOrig: false }
-          ).
-          and_return(id: 1_536_238, Location: 'http://example.com/1536238')
+                    textname: 'MyFile.docx', toRepository: true, saveOrig: false },
+            read_timeout: 120
+          )
       )
 
       result =
@@ -91,13 +118,14 @@ describe Plagscan::Documents do
 
   describe '.retrieve' do
     it 'calls to PlagScan document retrieve API with token, document ID and mode' do
+      allow(Plagscan::Request).to(
+        receive(:json_request).
+          with('documents/189/retrieve', access_token: 'my-token', body: { mode: 2 }).
+          and_return(reportData: '<xml>content</xml>')
+      )
       expect(Plagscan::Request).to(
         receive(:json_request).
-          with(
-            'documents/189/retrieve',
-            access_token: 'my-token', body: { mode: 2 }
-          ).
-          and_return(reportData: '<xml>content</xml>')
+          with('documents/189/retrieve', access_token: 'my-token', body: { mode: 2 })
       )
 
       result = described_class.retrieve(access_token: 'my-token', document_id: 189, mode: 2)
@@ -106,13 +134,14 @@ describe Plagscan::Documents do
     end
 
     it 'includes userID if specified' do
+      allow(Plagscan::Request).to(
+        receive(:json_request).
+          with('documents/189/retrieve', access_token: 'my-token', body: { mode: 2, userID: 57 }).
+          and_return(reportData: '<xml>content</xml>')
+      )
       expect(Plagscan::Request).to(
         receive(:json_request).
-          with(
-            'documents/189/retrieve',
-            access_token: 'my-token', body: { mode: 2, userID: 57 }
-          ).
-          and_return(reportData: '<xml>content</xml>')
+          with('documents/189/retrieve', access_token: 'my-token', body: { mode: 2, userID: 57 })
       )
 
       result =

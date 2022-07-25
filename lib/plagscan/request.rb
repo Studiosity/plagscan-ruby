@@ -43,7 +43,7 @@ module Plagscan
 
       private
 
-      def create_http(options)
+      def create_http(options) # rubocop:disable Metrics/AbcSize
         uri = URI api_url
         http = Net::HTTP.new(uri.host, uri.port)
 
@@ -51,6 +51,10 @@ module Plagscan
           http.use_ssl = true
           http.verify_mode = options[:ssl_verify_mode]
           http.ca_file = options[:ssl_ca_file] if options[:ssl_ca_file]
+        end
+
+        %i[open_timeout write_timeout read_timeout].each do |option|
+          http.__send__("#{option}=", options[option]) if options[option]
         end
 
         http
@@ -68,7 +72,7 @@ module Plagscan
       end
 
       def body_request(uri, headers, options)
-        uri += '?access_token=' + options[:access_token] if options[:access_token]
+        uri += "?access_token=#{options[:access_token]}" if options[:access_token]
         req = http_method(options).new(uri, headers)
         add_body(req, options[:body]) if options[:body]
         req
@@ -77,7 +81,7 @@ module Plagscan
       def uri_request(uri, headers, options)
         body = options[:body] || {}
         body[:access_token] = options[:access_token] if options[:access_token]
-        uri += '?' + body.map { |k, v| "#{k}=#{v}" }.join('&') unless body.empty?
+        uri += "?#{body.map { |k, v| "#{k}=#{v}" }.join('&')}" unless body.empty?
         http_method(options).new(uri, headers)
       end
 

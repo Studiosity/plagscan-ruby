@@ -7,10 +7,14 @@ describe Plagscan::Token do
     subject(:fetch) { described_class.fetch client_id: '12345', client_secret: 'abcde' }
 
     it 'calls to PlagScan token API with credentials' do
-      expect(Plagscan::Request).to(
+      allow(Plagscan::Request).to(
         receive(:json_request).
           with('token', method: :post, body: { client_id: '12345', client_secret: 'abcde' }).
           and_return(access_token: 'your_token', expires_in: 3600)
+      )
+      expect(Plagscan::Request).to(
+        receive(:json_request).
+          with('token', method: :post, body: { client_id: '12345', client_secret: 'abcde' })
       )
 
       expect(fetch).to eq(access_token: 'your_token', expires_in: 3600)

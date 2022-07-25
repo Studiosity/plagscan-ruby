@@ -26,7 +26,8 @@ module Plagscan
       Plagscan::Request.json_request(
         'documents',
         method: :post, access_token: access_token, expected_result: Net::HTTPCreated,
-        body: create_props.merge(file ? { fileUpload: file } : { textdata: text })
+        body: create_props.merge(file ? { fileUpload: file } : { textdata: text }),
+        read_timeout: 120
       )
     end
 
