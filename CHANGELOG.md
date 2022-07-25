@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [0.0.6](releases/tag/v0.0.6) - 2022-07-25
+### Fixed
+- [#3] Increase read timeout for Documents#create to 2 minutes
+
 ## [0.0.5](releases/tag/v0.0.5) - 2020-03-01
 ### Fixed
 - Address CVE-2020-8130 - `rake` OS command injection vulnerability
