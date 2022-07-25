@@ -152,7 +152,7 @@ describe Plagscan::Request do
   describe '.json_request' do
     it 'allows just path to be passed through to `request`' do
       stub_request(:get, 'https://api.plagscan.com/v3/my/path').to_return(body: '{"key":"abc"}')
-      if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.7.0')
+      if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.8.0')
         expect(described_class).to receive(:request).with('my/path').and_call_original
       else
         expect(described_class).to receive(:request).with('my/path', {}).and_call_original
